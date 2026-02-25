@@ -8,7 +8,7 @@ class UsersController < ApplicationController
       # se salvou, devolve mensagem de sucesso com os dados do usuário (exceto a senha)
       render json: {
         mensagem: "Usuário cadastrado com sucesso!",
-        usuario: { id: usuario.id, name: usuario.name, email: usuario.email }
+        usuario: { id: usuario.id, name: usuario.name, surname: usuario.surname, email: usuario.email }
       }, status: :created
     else
       # se falhou, devolve o erro de validação.
@@ -20,6 +20,6 @@ class UsersController < ApplicationController
 
   # mtd privado para permitir só esses parametros.
   def parametros
-    params.permit(:name, :email, :password, :birthdate, :gender)
+    params.permit(:name, :surname, :email, :password, :birthdate, :gender)
   end
 end
