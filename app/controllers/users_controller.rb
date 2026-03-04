@@ -1,25 +1,21 @@
 class UsersController < ApplicationController
-  def create
-    # Criação do usuário:
-    usuario = User.new(parametros)
+  def new
+    @user = User.new
+  end
 
-    # condicional para tentativa de salvar o usuário no banco.
-    if usuario.save
-      # se salvou, devolve mensagem de sucesso com os dados do usuário (exceto a senha)
-      render json: {
-        mensagem: "Usuário cadastrado com sucesso!",
-        usuario: { id: usuario.id, name: usuario.name, surname: usuario.surname, email: usuario.email }
-      }, status: :created
+  def create
+    @user = User.new(parametros_permitidos)
+
+    if @user.save
+      redirect_to root_path, notice: "Cadastro realizado com sucesso! Faça seu login."
     else
-      # se falhou, devolve o erro de validação.
-      render json: { erros: usuario.errors.full_messages }, status: :unprocessable_entity
+      render :new, status: :unprocessable_entity
     end
   end
 
   private
 
-  # mtd privado para permitir só esses parametros.
-  def parametros
-    params.permit(:name, :surname, :email, :password, :birthdate, :gender)
+  def parametros_permitidos
+    params.require(:user).permit(:name, :last_name, :email, :password, :birthdate, :gender)
   end
 end

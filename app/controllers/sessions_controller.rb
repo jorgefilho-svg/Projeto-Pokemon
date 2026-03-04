@@ -1,17 +1,22 @@
 class SessionsController < ApplicationController
+  def new
+  end
+
   def create
     usuario = User.find_by(email: params[:email])
 
     if usuario && usuario.authenticate(params[:password])
       # gerando um token toda vez que o user fizer login.
-      usuario.regenerate_token
+      session[:user_id] = usuario.id
+      redirect_to home_path, notice: "Sessão iniciada com sucesso!"
 
-      render json: {
-        mensagem: "Login realizado com sucesso!",
-        token: usuario.token # entregar o token.
-      }, status: :ok
     else
-      render json: { erro: "E-mail ou senha inválidos" }, status: :unauthorized
+      flash.now[:alert] = "E-mail ou palavra-passe inválidos." # exibi a msg de erro.
+      render :new, status: :unprocessable_entity
     end
+  end
+  def destroy
+    session[:user_id] = nil
+    redirect_to root_path, notice: "Terminou a sessão com sucesso."
   end
 end

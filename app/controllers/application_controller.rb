@@ -1,18 +1,18 @@
-class ApplicationController < ActionController::API
+class ApplicationController < ActionController::Base
+  helper_method :current_user, :logged_in?
+
+  def current_user
+    @current_user ||= User.find_by(id: session[:user_id])
+  end
+
+  def logged_in?
+    current_user.present?
+  end
+
   def verificar_login
-    # ver se não tem token no header da requisição
-    token_enviado = request.headers["Authorization"]
-
-    if token_enviado.blank?
-      render json: { erro: "Acesso negado. Você precisa enviar o token." }, status: :unauthorized
-      return
-    end
-    # procurar user com esse token no banco de dados.
-    usuario_atual = User.find_by(token: token_enviado)
-
-    # se não encontrar, devolver erro de acesso negado.
-    if usuario_atual.nil?
-      render json: { erro: "Acesso negado. Faça login para continuar." }, status: :unauthorized
+    unless logged_in?
+      flash[:alert] = "Você precisa fazer login para acessar esta página."
+      redirect_to root_path
     end
   end
 end

@@ -1,0 +1,51 @@
+<div style="max-width: 600px; margin: 40px auto; font-family: sans-serif;">
+  
+  <header style="background: #138e28; color: white; padding: 10px; border-radius: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+    <h3>
+      Olá, <%= current_user.name %> <%= current_user.last_name %> você tem <%= current_user.age %> anos de idade.
+    </h3>
+    
+    <%= button_to "Sair", logout_path, method: :delete, style: "background: #ff4c4c; color: white; border: none; padding: 8px 15px; border-radius: 5px;" %>
+  </header>
+
+  <div style="text-align: center; margin-bottom: 20px;">
+    <h2>Busque pelo seu Pokémon!</h2>
+    
+    <%= form_with url: home_path, method: :get, local: true do |f| %>
+      <%= f.text_field :pokemon_name, placeholder: "Ex: pikachu, mew...", style: "padding: 10px; width: 60%; font-size: 14px;" %>
+      <%= f.submit "Buscar", style: "padding: 10px 20px; font-size: 16px; background: #4caf50; color: white; border: none; border-radius: 4px;" %>
+    <% end %>
+  </div>
+
+<div>
+    
+    <% if @pokemon %>
+      <div style="text-align: center;">
+        
+        <h2>
+          <%= @pokemon[:name] %> (#<%= @pokemon[:id] %>)
+        </h2>
+
+        <div style="display: flex; justify-content: center; gap: 20px;">
+          <p><strong>Tipo(s):</strong> <%= @pokemon[:types].join(", ") %></p>
+          <p><strong>Peso:</strong> <%= @pokemon[:weight].to_f / 10 %> kg</p>
+          <p><strong>Altura:</strong> <%= @pokemon[:height].to_f / 10 %> m</p>
+          <p><strong>Exp. Base:</strong> <%= @pokemon[:base_experience] %></p>
+        </div>
+
+      </div>
+
+    <% elsif @erro %>
+      <p style="color: red; text-align: center; margin-top: 60px; font-weight: bold; font-size: 18px;">
+        <%= @erro %>
+      </p>
+
+    <% else %>
+      <p style="color: gray; text-align: center; margin-top: 60px; font-size: 14px;">
+        Seu pokémon aparecerá aqui!
+      </p>
+    <% end %>
+
+  </div>
+
+</div>

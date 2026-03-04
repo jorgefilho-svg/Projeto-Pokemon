@@ -1,8 +1,12 @@
 Rails.application.routes.draw do
-  # rota do pokemom
-  get "/pokemons/:id", to: "pokemons#show"
-  # rota de criação de usuário
-  post "/users", to: "users#create"
-  # rota de login
-  post "/login", to: "sessions#create"
+  root "sessions#new"
+
+  get    "/login",   to: "sessions#new"
+  post   "/login",   to: "sessions#create"
+  delete "/logout",  to: "sessions#destroy"
+
+  get  "/cadastro", to: "users#new"
+  post "/users",    to: "users#create"
+
+  get "/home", to: "pages#home"
 end
