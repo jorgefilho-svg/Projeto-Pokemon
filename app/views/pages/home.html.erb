@@ -1,19 +1,19 @@
 <div style="max-width: 600px; margin: 40px auto; font-family: sans-serif;">
   
-  <header style="background: #138e28; color: white; padding: 10px; border-radius: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-    <h3>
-      Olá, <%= current_user.name %> <%= current_user.last_name %> você tem <%= current_user.age %> anos de idade.
+  <header style="background: #138e28; color: white; padding: 1px; border-radius: 5px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+    <h3 style="font-size: 16px; margin: 5px;">
+      Olá, <%= current_user.full_name %> você tem <%= current_user.age %> anos de idade.
     </h3>
     
-    <%= button_to "Sair", logout_path, method: :delete, style: "background: #ff4c4c; color: white; border: none; padding: 8px 15px; border-radius: 5px;" %>
+    <%= button_to "Sair", logout_path, method: :delete, style: "background: #ff4c4c; color: white; border: none; padding: 5px 10px; border-radius: 5px;" %>
   </header>
 
-  <div style="text-align: center; margin-bottom: 20px;">
-    <h2>Busque pelo seu Pokémon!</h2>
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h2 style="font-size: 16px;">Busque pelo seu Pokémon!</h2>
     
     <%= form_with url: home_path, method: :get, local: true do |f| %>
-      <%= f.text_field :pokemon_name, placeholder: "Ex: pikachu, mew...", style: "padding: 10px; width: 60%; font-size: 14px;" %>
-      <%= f.submit "Buscar", style: "padding: 10px 20px; font-size: 16px; background: #4caf50; color: white; border: none; border-radius: 4px;" %>
+      <%= f.text_field :pokemon_name, placeholder: "Ex: pikachu, mew...", style: "padding: 5px; width: 60%; font-size: 14px;" %>
+      <%= f.submit "Buscar", style: "padding: 5px; font-size: 16px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer;" %>
     <% end %>
   </div>
 
@@ -25,6 +25,14 @@
         <h2>
           <%= @pokemon[:name] %> (#<%= @pokemon[:id] %>)
         </h2>
+        <div>
+          <% if current_user.pokemons.exists?(name: @pokemon[:name]) %>
+            <%= button_to "Remover Favorito", desfavoritar_path(pokemon_name: @pokemon[:name]), method: :delete, style: "background: #ff4c4c; color: white; font-weight: bold; border: none; padding: 10px; border-radius: 5px; cursor: pointer;" %>
+          
+          <% else %>
+            <%= button_to "Favoritar Pokémon", favoritar_path(pokemon_name: @pokemon[:name]), method: :post, style: "background: #4caf50; color: white; font-weight: bold; border: none; padding: 10px; border-radius: 5px; cursor: pointer;" %>
+          <% end %>
+        </div>
 
         <div style="display: flex; justify-content: center; gap: 20px;">
           <p><strong>Tipo(s):</strong> <%= @pokemon[:types].join(", ") %></p>
@@ -32,7 +40,10 @@
           <p><strong>Altura:</strong> <%= @pokemon[:height].to_f / 10 %> m</p>
           <p><strong>Exp. Base:</strong> <%= @pokemon[:base_experience] %></p>
         </div>
-
+        
+        <div style="display: flex; justify-content: center; gap: 20px;">
+          <p><strong>Cadeia Evolutiva:</strong> <%= @pokemon[:evolution_chain].join(" → ") %></p>          
+        </div>
       </div>
 
     <% elsif @erro %>
@@ -46,6 +57,49 @@
       </p>
     <% end %>
 
+  </div>
+
+</div>
+<div style="display: flex; justify-content: space-between; margin-top: 50px; padding-top: 20px; border-top: 2px solid #ccc; align-items: stretch;">
+
+  <div style="flex: 1; padding-right: 20px; border-right: 2px solid #ccc;">
+    <h3>Pokémons Recentes</h3>
+    
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+      <% if @recentes.any? %>
+        <% @recentes.each do |poke| %>
+          <div style="display: inline-block; background-color: #f1f1f1; border: 1px solid #000000; padding: 5px 10px; border-radius: 15px; margin-bottom: 10px;">
+            <%= poke.name %> (#<%= poke.poke_id %>)
+
+            <% if current_user.pokemons.exists?(name: poke.name) %>
+              <%= button_to "Remover Favorito", desfavoritar_path(pokemon_name: poke.name), method: :delete, style: "background: #ff4c4c; color: white; font-weight: bold; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-top: 8px; width: 100%;" %>
+            <% else %>
+              <%= button_to "Favoritar", favoritar_path(pokemon_name: poke.name), method: :post, style: "background: #4caf50; color: white; font-weight: bold; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-top: 8px; width: 100%;" %>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <p>Nenhum Pokémon recente disponível.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="flex: 1; padding-left: 20px;">
+    <h3>Meus Pokémons Favoritos</h3>
+    
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <% se_tem_favoritos = current_user.pokemons.any? %>
+      
+      <% if se_tem_favoritos %>
+        <% current_user.pokemons.each do |fav| %>
+          <span style="display: inline-block; background-color: #f1f1f1; border: 1px solid #000000; padding: 5px 10px; border-radius: 15px;">
+            <%= fav.name %> (#<%= fav.poke_id %>)
+          </span>
+        <% end %>
+      <% else %>
+        <p>Você ainda não favoritou nenhum Pokémon.</p>
+      <% end %>
+    </div>
   </div>
 
 </div>

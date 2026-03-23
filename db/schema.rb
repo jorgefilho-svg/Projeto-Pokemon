@@ -10,7 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_02_171858) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_145354) do
+  create_table "favorites", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "pokemon_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["pokemon_id"], name: "index_favorites_on_pokemon_id"
+    t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
+  create_table "pokemons", force: :cascade do |t|
+    t.integer "base_experience"
+    t.datetime "created_at", null: false
+    t.string "evolutions"
+    t.integer "height"
+    t.string "name"
+    t.integer "poke_id"
+    t.string "types"
+    t.datetime "updated_at", null: false
+    t.integer "weight"
+  end
+
   create_table "users", force: :cascade do |t|
     t.date "birthdate"
     t.datetime "created_at", null: false
@@ -22,4 +43,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_171858) do
     t.string "token"
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "favorites", "pokemons"
+  add_foreign_key "favorites", "users"
 end

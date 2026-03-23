@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+  before_action :redirecionar_se_logado, only: [ :new, :create ]
   def new
   end
 

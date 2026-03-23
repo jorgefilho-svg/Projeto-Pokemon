@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  before_action :redirecionar_se_logado, only: [ :new, :create ]
   def new
     @user = User.new
   end

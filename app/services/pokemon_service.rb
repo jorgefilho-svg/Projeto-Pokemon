@@ -3,10 +3,25 @@ class PokemonService
   base_uri "https://pokeapi.co/api/v2"
 
   def initialize(pokemon_name_or_id)
-    @query = pokemon_name_or_id.to_s.downcase #deixa tudo em minusculo para evitar erros de case-sensitive
+    @query = pokemon_name_or_id.to_s.downcase
   end
 
   def execute
+    pokemon_local = Pokemon.find_by(name: @query)
+
+    if pokemon_local
+      pokemon_local.touch # att para manter o registro como recente
+      return {
+        id: pokemon_local.poke_id,
+        name: pokemon_local.name,
+        types: pokemon_local.types.split(", "),
+        weight: pokemon_local.weight,
+        height: pokemon_local.height,
+        base_experience: pokemon_local.base_experience,
+        evolution_chain: pokemon_local.evolutions.split(", ")
+      }
+    end
+
     # Busca dados do Pokémon
     pokemon_response = self.class.get("/pokemon/#{@query}")
     return nil unless pokemon_response.success?
@@ -19,10 +34,24 @@ class PokemonService
     evo_chain_url = species_response["evolution_chain"]["url"]
     evo_chain_response = HTTParty.get(evo_chain_url)
 
-    # Formata e retorna o JSON final
-    build_response(pokemon_response, evo_chain_response)
+    pokemon_data = build_response(pokemon_response, evo_chain_response)
+
+    if pokemon_data
+      Pokemon.create(
+        poke_id: pokemon_data[:id],
+        name: pokemon_data[:name],
+        types: pokemon_data[:types].join(", "),
+        weight: pokemon_data[:weight],
+        height: pokemon_data[:height],
+        base_experience: pokemon_data[:base_experience],
+        evolutions: pokemon_data[:evolution_chain].join(", ")
+      )
+    end
+
+    pokemon_data
+
   rescue StandardError => e
-    # Retorna nil em caso de erro de conexão ou parse
+    puts "Erro ao buscar dados do Pokémon: #{e.message}"
     nil
   end
 

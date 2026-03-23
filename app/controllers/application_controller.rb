@@ -15,4 +15,10 @@ class ApplicationController < ActionController::Base
       redirect_to root_path
     end
   end
+
+  def redirecionar_se_logado
+    if logged_in?
+      redirect_to home_path
+    end
+  end
 end

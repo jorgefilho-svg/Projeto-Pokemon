@@ -9,4 +9,9 @@ Rails.application.routes.draw do
   post "/users",    to: "users#create"
 
   get "/home", to: "pages#home"
+
+  post "/favoritar", to: "favorites#create"
+  delete "/desfavoritar", to: "favorites#destroy"
+
+  get "/pokemons/:id", to: "pokemons#show"
 end
